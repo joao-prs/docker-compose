@@ -1,0 +1,80 @@
+version: '3.5'
+
+volumes:
+  netbox-media-files:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=172.18.32.100,rw
+      device: ":/nfs/docker/netbox_ti"
+  netbox-redis-data:
+    driver: local
+
+x-op-restart-policy: &restart_policy
+  restart_policy:
+    condition: on-failure
+    delay: 5s
+    window: 60s
+x-nb-image: &x-image-nb
+  image: netboxcommunity/netbox:v3.4.6
+  # image: netboxcommunity/netbox
+
+x-redis-image: &x-redis-image
+  image: redis:6-alpine
+x-redis-config: &x-redis-config
+    <<: *x-redis-image
+    env_file: 
+      - environment/redis.env
+    volumes:
+      - netbox-redis-data:/data
+    deploy:
+      restart_policy :
+        condition: any
+        delay: 5s
+        window: 30s
+x-nb-config: &x-nb-config
+  <<: *x-image-nb
+  depends_on:
+    - redis
+    - redis-cache
+  volumes:
+    - netbox-media-files:/opt/netbox/netbox/media:z
+    #- ./configuration/configuration.py:/etc/netbox/config/configuration.py
+  env_file: 
+    - environment/netbox.env
+  user: '101'
+  deploy:
+    <<: *restart_policy 
+    mode: replicated
+    replicas: 1
+    update_config:
+        parallelism: 2
+        delay: 10s
+services:
+  netbox:
+    <<: *x-nb-config
+    depends_on:
+      - netbox-worker
+    ports:
+      - 9028:8080
+  netbox-worker:
+    <<: *x-nb-config
+    entrypoint:
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+    command:
+      - rqworker
+    ports: []
+  # redis
+  redis:
+    <<: *x-redis-config
+    command:
+      - sh
+      - -c
+      - redis-server --appendonly yes --requirepass $$REDIS_PASSWORD
+  redis-cache:
+    <<: *x-redis-config
+    command:
+      - sh
+      - -c
+      - redis-server --requirepass $$REDIS_CACHE_PASSWORD

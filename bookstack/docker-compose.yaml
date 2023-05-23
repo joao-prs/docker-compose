@@ -1,0 +1,20 @@
+version: "3.4"
+
+volumes:
+  uploads:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=172.18.32.100,rw
+      device: ":/nfs/docker/uploads"
+
+services:
+  bookstack:
+    #image: solidnerd/bookstack:latest
+    image: solidnerd/bookstack:22.10.2
+    env_file:
+      - environment/bookstack.env
+    volumes:
+      - uploads:/var/www/bookstack/public/uploads
+    ports:
+      - 9008:8080
