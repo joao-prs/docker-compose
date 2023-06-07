@@ -1,0 +1,114 @@
+version: "3.7"
+
+volumes:
+  # pgdata:
+  opdata:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=172.18.32.100,rw
+      device: ":/nfs/docker/openproject"
+    
+x-op-restart-policy: &restart_policy
+  restart_policy: 
+    condition: on-failure
+    delay: 5s
+    window: 60s  
+
+x-op-image: &image
+  image: openproject/community:12.0
+x-op-app: &app
+  <<: *image
+  # <<: *restart_policy
+  env_file: 
+    - environment/openproject.env
+  volumes:
+    - "${OPDATA:-opdata}:/var/openproject/assets"
+  deploy:
+      <<: *restart_policy
+
+services:
+  cache:
+    image: memcached
+    deploy:
+      <<: *restart_policy
+
+  proxy:
+    <<: *image
+    # <<: *restart_policy
+    command: "./docker/prod/proxy"
+    ports:
+      - "9007:80"
+    # env_file: 
+      # - env/proxy.env
+    environment:
+      APP_HOST: web
+      OPENPROJECT_RAILS__RELATIVE__URL__ROOT: "${OPENPROJECT_RAILS__RELATIVE__URL__ROOT:-}"
+    depends_on:
+      - web
+    # networks:
+    #   - frontend
+    deploy:
+      <<: *restart_policy
+
+  web:
+    <<: *app
+    command: "./docker/prod/web"
+    # networks:
+    #   - frontend
+    #   - backend
+    depends_on:
+      #- db
+      - cache
+      - seeder
+    labels:
+      - autoheal=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080${OPENPROJECT_RAILS__RELATIVE__URL__ROOT:-}/health_checks/default"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+
+  autoheal:
+    image: willfarrell/autoheal:1.2.0
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      AUTOHEAL_CONTAINER_LABEL: autoheal
+
+  worker:
+    <<: *app
+    command: "./docker/prod/worker"
+    # networks:
+    #   - backend
+    depends_on:
+      #- db
+      - cache
+      - seeder
+    deploy:
+      <<: *restart_policy 
+      mode: replicated
+      replicas: 1
+      update_config:
+        parallelism: 2
+        delay: 10s
+
+  cron:
+    <<: *app
+    command: "./docker/prod/cron"
+    # networks:
+    #   - backend
+    depends_on:
+      #- db
+      - cache
+      - seeder
+
+  seeder:
+    <<: *app
+    command: "./docker/prod/seeder"
+    # networks:
+    #   - backend
+    deploy:
+      <<: *restart_policy
+    # restart: on-failure
