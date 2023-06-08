@@ -1,0 +1,28 @@
+version: '3.5'
+
+services:
+  semaphore:
+    ports:
+      - 9010:3000
+      #- 3000:3000
+    image: ansiblesemaphore/semaphore:latest
+    env_file:
+      - env/semaphore.env
+    volumes:
+      - semaphore_data:/home/semaphore/
+      # - /root/.ssh/known_hosts:/home/semaphore/.ssh/known_hosts:ro
+    configs:
+    - source: semaphore_config
+      target: /etc/semaphore/config.json 
+
+configs:
+  semaphore_config:
+    file: ./config.json
+
+volumes:
+  semaphore_data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: nfsvers=4,addr=172.18.32.100,rw
+      device: ":/nfs/docker/semaphore"
