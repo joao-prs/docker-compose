@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  metabase:
+    # image: metabase/metabase:latest
+    image: metabase/metabase:v0.42.4
+    env_file: 
+      - environment/metabase.env
+    ports:
+    - published: 9020
+      target: 3000
