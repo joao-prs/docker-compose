@@ -1,0 +1,22 @@
+version: '3.5'
+
+x-p-prestart-policy: &restart_policy
+  restart_policy:
+    condition: any
+    delay: 5s
+    window: 20s  
+
+services:
+  wekan:
+    image: quay.io/wekan/wekan
+
+    ports:
+      - 9009:8080
+    env_file:
+      - environment/wekan.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+    deploy:
+      <<: *restart_policy 
+      mode: replicated
+      replicas: 1
