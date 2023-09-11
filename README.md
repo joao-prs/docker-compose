@@ -1,4 +1,7 @@
 # docker-compose
+
+<div align="center" style="align-items: flex-start;"><img src="https://techstack-generator.vercel.app/docker-icon.svg" alt="icon" width="65" height="65" /></div>
+
 Uma piscina de exemplos e até estruturas prontas para subir um compose rapidamente. Boa leitura deste README e os composes 👻
 
 ## Docker Compose
