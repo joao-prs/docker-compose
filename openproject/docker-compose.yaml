@@ -41,7 +41,6 @@ services:
       - web
     deploy:
       <<: *restart_policy
-
   web:
     <<: *app
     command: "./docker/prod/web"
@@ -56,14 +55,12 @@ services:
       timeout: 3s
       retries: 3
       start_period: 30s
-
   autoheal:
     image: willfarrell/autoheal:1.2.0
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
     environment:
       AUTOHEAL_CONTAINER_LABEL: autoheal
-
   worker:
     <<: *app
     command: "./docker/prod/worker"
@@ -77,7 +74,6 @@ services:
       update_config:
         parallelism: 2
         delay: 10s
-
   cron:
     <<: *app
     command: "./docker/prod/cron"
