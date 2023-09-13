@@ -4,11 +4,9 @@ volumes:
   netbox-media-files:
     driver: local
     driver_opts:
-      type: nfs
-      o: nfsvers=4,addr=172.18.32.100,rw
-      device: ":/nfs/docker/netbox_ti"
-  netbox-redis-data:
-    driver: local
+      type: none
+      device: "/home/ubuntu/volumes/netbox"
+      o: bind
 
 x-op-restart-policy: &restart_policy
   restart_policy:
@@ -16,8 +14,7 @@ x-op-restart-policy: &restart_policy
     delay: 5s
     window: 60s
 x-nb-image: &x-image-nb
-  image: netboxcommunity/netbox:v3.4.6
-  # image: netboxcommunity/netbox
+  image: netboxcommunity/netbox
 
 x-redis-image: &x-redis-image
   image: redis:6-alpine
@@ -39,7 +36,6 @@ x-nb-config: &x-nb-config
     - redis-cache
   volumes:
     - netbox-media-files:/opt/netbox/netbox/media:z
-    #- ./configuration/configuration.py:/etc/netbox/config/configuration.py
   env_file: 
     - environment/netbox.env
   user: '101'

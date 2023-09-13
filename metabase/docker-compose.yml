@@ -2,8 +2,7 @@ version: '3.4'
 
 services:
   metabase:
-    # image: metabase/metabase:latest
-    image: metabase/metabase:v0.42.4
+    image: metabase/metabase:latest
     env_file: 
       - environment/metabase.env
     ports:

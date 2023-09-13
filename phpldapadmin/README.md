@@ -1,3 +1,0 @@
-# phpldapadmin
-
-still nothing
