@@ -20,4 +20,6 @@
   </tr>
 </table>
 
+Aprenda a instalar o `docker` em seu ambiente clicando <a href="https://github.com/joao-prs/docker-compose/blob/main/README_INSTALL.md">aqui</a>.
+
 Para mais. visite este <a href="https://www.docker.com/">site</a>.
