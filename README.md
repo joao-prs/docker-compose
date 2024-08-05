@@ -22,7 +22,7 @@
 </table>
 
 Para mais. visite este <a href="https://www.docker.com/">site</a>. ☺️
-
-Aprenda a instalar o `docker` em seu ambiente clicando <a href="https://github.com/joao-prs/docker-compose/blob/main/README_INSTALL.md">aqui</a>. Se quiser saber um pouco de como configurar e com alguns exemplos simples, leia meu artigo abaixo 👇
+> [!NOTE]
+> Aprenda a instalar o `docker` em seu ambiente clicando <a href="https://github.com/joao-prs/docker-compose/blob/main/README_INSTALL.md">aqui</a>. Se quiser saber um pouco de como configurar e com alguns exemplos simples, leia meu artigo abaixo 👇
 
 <a target="_blank" href="https://github-readme-medium-recent-article.vercel.app/medium/@joao-prs/2"><img src="https://github-readme-medium-recent-article.vercel.app/medium/@joao-prs/2" alt="Recent Article 2"> 
